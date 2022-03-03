@@ -1,0 +1,13 @@
+---
+- name : Installation d'Apache
+  become : yes
+  apt: name=apache2 state=latest
+
+- name : Start Apache
+  become : yes
+  service : name=apache2 state=started enabled=true
+
+- name : Restart Apache
+  become : yes
+  service : name=apache2 state=restarted enabled=true
+

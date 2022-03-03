@@ -1,0 +1,15 @@
+
+{{motd_ascii}}
+System Information For Hostname: {{ inventory_hostname }}
+Distribution: {{ ansible_distribution }}
+Distribution Release: {{ ansible_distribution_release }}
+Distribution Version: {{ ansible_distribution_version }}
+{% if ansible_dns.nameservers is defined %}
+DNS Server(s): {{ ansible_dns.nameservers|join (" ") }}
+{% endif %}
+Kernel: {{ ansible_kernel }}
+Memory Installed: {{ (ansible_memtotal_mb / 1024) | round(1) }}GB
+Memory Swapfile: {{ (ansible_swaptotal_mb / 1024) | round(1) }}GB
+Processors: {{ ansible_processor_vcpus }}
+Python Version: {{ ansible_python_version }}
+Timezone: {{ ansible_date_time.tz }}({{ ansible_date_time.tz_offset }})

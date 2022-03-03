@@ -1,0 +1,9 @@
+---
+- name : Installation des tools
+  become : yes
+  apt: name = {{ item }} update_cache=yes state=latest
+  with_items:
+    - nano
+    - htop
+    - git
+    - zsh

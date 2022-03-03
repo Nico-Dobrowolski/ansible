@@ -1,0 +1,8 @@
+---
+- name : Changer le MOTD
+  become : yes
+  vars : 
+    motd_ascii : "     _              _ _     _\n    / \\   _ __  ___(_) |__ | | ___\n   / _ \\ | '_ \\/ __| | '_ \\| |/ _ \\\n  / ___ \\| | | \\__ \\ | |_) | |  __/\n /_/   \\_\\_| |_|___/_|_.__/|_|\\___|\n"
+  template :
+    src : motd.j2
+    dest : /etc/motd

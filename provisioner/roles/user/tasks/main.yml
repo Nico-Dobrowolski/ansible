@@ -1,0 +1,6 @@
+---
+- name : Création d'une liste d'utilisateur par defaut
+  become : true
+  user : name={{ item.username }} shell=/bin/bash comment='Default user by Ansible' state=present
+  with_items :
+    - { username: 'dev' }
