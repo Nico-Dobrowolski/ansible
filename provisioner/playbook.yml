@@ -4,12 +4,16 @@
   remote_user: vagrant
   roles:
     - utils
-    - user
     - motd
     - apache
+    - react-deploy
+
 - name : Installation de l'API
   hosts : machine.2
   remote_user: vagrant
   roles:
     - utils
+    - motd
+    - apache
+    - laravel-deploy
 ...

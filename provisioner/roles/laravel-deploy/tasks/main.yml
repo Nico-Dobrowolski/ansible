@@ -1,0 +1,100 @@
+
+---
+
+- name: Add dependencies for PHP versions (Debian).
+  become: true
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+    state: present
+
+- name: Add Ondrej Sury's apt key (Debian).
+  become: true
+  apt_key:
+    url: https://packages.sury.org/php/apt.gpg
+    id: 15058500A0235D97F5D10063B188E2B695BD4743
+    state: present
+
+- name: Add Ondrej Sury's repo (Debian).
+  become: true
+  apt_repository:
+    repo: "deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main"
+    state: present
+
+- name : Installation de PHP for Laravel with Apache
+  become: true
+  apt:
+    name :
+      - php8.0-fpm
+      - php8.0-mysql
+      - php8.0-mbstring
+      - php8.0-xml
+      - php8.0-zip
+      - libapache2-mod-php
+      - zip
+      - unzip
+      - php-xml
+      - php-curl
+    state : present
+
+- name: Download Composer installer
+  become : yes
+  tags: composer
+  get_url:
+    url: https://getcomposer.org/installer
+    dest: /tmp/composer-setup.php
+
+- name: Install composer
+  become : yes
+  tags: composer
+  command: php /tmp/composer-setup.php --install-dir=/usr/bin --filename=composer
+
+- name: Update to latest composer version
+  become : yes
+  tags: composer
+  command: composer selfupdate
+
+- name : clone repo laravel api
+  become: true
+  git :
+    repo: https://github.com/Nico-Dobrowolski/api.git
+    dest: /var/www/api
+
+- name: Download and update all libs and dependencies
+  become : yes
+  composer:
+    command : update
+    working_dir: /var/www/api
+  environment:
+    COMPOSER_NO_INTERACTION: "1"
+
+- name : Setup Virtual Host for Laravel api
+  become : yes
+  template :
+    src : api.com.conf
+    dest : /etc/apache2/sites-available/
+
+- name: Enable Laravel api site
+  become : yes
+  shell: /usr/sbin/a2ensite api.com.conf
+
+- name: Disable default Apache site
+  become : yes
+  shell: /usr/sbin/a2dissite 000-default.conf
+
+- name: enabled mod_rewrite
+  become : yes
+  apache2_module: name=rewrite state=present
+
+- name: restarted Apache2
+  become : yes
+  service: name=apache2 state=restarted
+
+- name: Change permissions file
+  become : yes
+  shell : find /var/www/api -type f -exec chmod 777 {} -R \;
+
+- name: Change permissions directory
+  become : yes
+  shell : find /var/www/api -type d -exec chmod 777 {} -R \;

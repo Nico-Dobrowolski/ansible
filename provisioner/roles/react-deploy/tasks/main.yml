@@ -1,0 +1,66 @@
+---
+- name: "Add nodejs apt key"
+  become: true
+  apt_key:
+    url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+    state: present
+
+- name: "Add nodejs 16.x ppa for apt repo"
+  become: true
+  apt_repository:
+    repo: deb https://deb.nodesource.com/node_16.x {{ ansible_distribution_release }} main
+    update_cache: yes
+
+- name: "Install nodejs"
+  become: true
+  apt:
+    update_cache: yes
+    name: nodejs
+    state: latest
+
+- name : clone repo react app
+  become: true
+  git :
+    repo: https://github.com/Nico-Dobrowolski/app.git
+    dest: /opt/app
+
+- name: Init app
+  become: true
+  command: npm i
+  args:
+    chdir: "/opt/app"
+
+- name: Build app
+  become: true
+  command: npm run build
+  args:
+    chdir: "/opt/app"
+
+- name: Copy file to var/www
+  become: true
+  copy:
+    remote_src : yes
+    src: /opt/app/build
+    dest: /var/www
+
+- name : Setup Virtual Host for React app
+  become : yes
+  template :
+    src : app.com.conf
+    dest : /etc/apache2/sites-available/
+
+- name: Enable React app site
+  become : yes
+  shell: /usr/sbin/a2ensite app.com.conf
+
+- name: Disable default Apache site
+  become : yes
+  shell: /usr/sbin/a2dissite 000-default.conf
+
+- name: enabled mod_rewrite
+  become : yes
+  apache2_module: name=rewrite state=present
+
+- name: restarted Apache2
+  become : yes
+  service: name=apache2 state=restarted

@@ -1,9 +1,16 @@
 ---
+
+- name: Run the equivalent of "apt-get update" as a separate step
+  become: true
+  apt:
+    update_cache: yes
+
 - name : Installation des tools
-  become : yes
-  apt: name = {{ item }} update_cache=yes state=latest
+  become: true
+  apt: name={{ item }} state=latest
   with_items:
-    - nano
-    - htop
+    - apache2
     - git
-    - zsh
+    - curl
+    - wget
+    - npm
