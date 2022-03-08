@@ -3,12 +3,18 @@ Vagrant.configure("2") do | config |
   N = 2
   ANSIBLE_INVENTORY_DIR = "provisioner"
   VAGRANT_VM_PROVIDER   = "virtualbox"
-  # ensure directory exists
+  # ensure directory exists & clean 
   Dir.mkdir(ANSIBLE_INVENTORY_DIR) unless Dir.exist?(ANSIBLE_INVENTORY_DIR)
   File.open("#{ANSIBLE_INVENTORY_DIR}/hosts", "w") {|file| file.truncate(0) }
   
   (1..N).each do | machine_id |
     config.vm.define "machine.#{machine_id}" do | server |
+    
+      server.vm.provider "libvirt" do |config|
+        config.memory = 2048
+        config.cpus = 2
+      end
+
       server.vm.box      = "debian/buster64"
       server.vm.hostname = "machine.#{machine_id}"
       server.vm.network "private_network", ip:"192.168.50.#{50+machine_id-1}"
@@ -25,7 +31,7 @@ Vagrant.configure("2") do | config |
         ansible.limit           = "192.168.50.#{50+machine_id-1}"
         ansible.playbook        = "provisioner/playbook.yml"
         ansible.inventory_path  = "#{ANSIBLE_INVENTORY_DIR}/hosts"
-        ansible.verbose         = "-v"
+        # ansible.verbose         = "-v"
       end
     end
   end

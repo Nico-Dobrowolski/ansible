@@ -69,6 +69,23 @@
   environment:
     COMPOSER_NO_INTERACTION: "1"
 
+
+- name: Disable default Apache site
+  become : yes
+  shell: /usr/sbin/a2dissite 000-default.conf
+
+- name: Enabled mod_rewrite
+  become : yes
+  apache2_module: name=rewrite state=present
+
+- name: Enabled mod_headers
+  become : yes
+  apache2_module: name=headers state=present
+## Handel
+- name: restarted Apache2 
+  become : yes
+  service: name=apache2 state=restarted
+
 - name : Setup Virtual Host for Laravel api
   become : yes
   template :
@@ -78,14 +95,6 @@
 - name: Enable Laravel api site
   become : yes
   shell: /usr/sbin/a2ensite api.com.conf
-
-- name: Disable default Apache site
-  become : yes
-  shell: /usr/sbin/a2dissite 000-default.conf
-
-- name: enabled mod_rewrite
-  become : yes
-  apache2_module: name=rewrite state=present
 
 - name: restarted Apache2
   become : yes
@@ -98,3 +107,6 @@
 - name: Change permissions directory
   become : yes
   shell : find /var/www/api -type d -exec chmod 777 {} -R \;
+
+- name: Print the gateway this host
+  debug: var=ansible_default_ipv4.address

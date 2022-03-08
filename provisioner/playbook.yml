@@ -1,6 +1,15 @@
 ---
-- name : Installation des serveur web
+- name : Installation de l'API 
   hosts : machine.1
+  remote_user: vagrant
+  roles:
+    - utils
+    - motd
+    - apache
+    - laravel-deploy
+
+- name : Installation des serveur web
+  hosts : machine.2
   remote_user: vagrant
   roles:
     - utils
@@ -8,12 +17,4 @@
     - apache
     - react-deploy
 
-- name : Installation de l'API
-  hosts : machine.2
-  remote_user: vagrant
-  roles:
-    - utils
-    - motd
-    - apache
-    - laravel-deploy
 ...

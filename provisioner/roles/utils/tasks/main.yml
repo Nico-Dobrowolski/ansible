@@ -1,16 +1,17 @@
 ---
 
-- name: Run the equivalent of "apt-get update" as a separate step
+- name: Run apt of "apt-get update" as a separate step
   become: true
   apt:
     update_cache: yes
 
-- name : Installation des tools
+- name : Installation de PHP for Laravel with Apache
   become: true
-  apt: name={{ item }} state=latest
-  with_items:
-    - apache2
-    - git
-    - curl
-    - wget
-    - npm
+  apt:
+    name :
+      - apache2
+      - git
+      - curl
+      - wget
+      - npm
+    state : present

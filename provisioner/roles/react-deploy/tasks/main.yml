@@ -24,6 +24,12 @@
     repo: https://github.com/Nico-Dobrowolski/app.git
     dest: /opt/app
 
+- name : Copy .env.production to /opt/app
+  become : yes
+  copy:
+    src : .env.production
+    dest : /opt/app
+
 - name: Init app
   become: true
   command: npm i
@@ -36,12 +42,18 @@
   args:
     chdir: "/opt/app"
 
-- name: Copy file to var/www
+- name: Copy App to var/www
   become: true
   copy:
     remote_src : yes
     src: /opt/app/build
     dest: /var/www
+
+- name : Copy .htaccess to /var/www/build
+  become : yes
+  copy:
+    src : .htaccess
+    dest : /var/www/build
 
 - name : Setup Virtual Host for React app
   become : yes
