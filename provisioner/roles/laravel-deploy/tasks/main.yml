@@ -1,7 +1,7 @@
 
 ---
 
-- name: Add dependencies for PHP versions (Debian).
+- name: Ajout de dépendances pour les versions de PHP.
   become: true
   apt:
     name:
@@ -9,20 +9,20 @@
       - ca-certificates
     state: present
 
-- name: Add Ondrej Sury's apt key (Debian).
+- name: Ajouter la clé apt d'Ondrej Sury.
   become: true
   apt_key:
     url: https://packages.sury.org/php/apt.gpg
     id: 15058500A0235D97F5D10063B188E2B695BD4743
     state: present
 
-- name: Add Ondrej Sury's repo (Debian).
+- name: Ajouter le dépôt Ondrej Sury.
   become: true
   apt_repository:
     repo: "deb https://packages.sury.org/php/ {{ ansible_distribution_release }} main"
     state: present
 
-- name : Installation de PHP for Laravel with Apache
+- name : Installation de PHP pour Laravel
   become: true
   apt:
     name :
@@ -38,30 +38,30 @@
       - php-curl
     state : present
 
-- name: Download Composer installer
+- name: Télécharger Composer
   become : yes
   tags: composer
   get_url:
     url: https://getcomposer.org/installer
     dest: /tmp/composer-setup.php
 
-- name: Install composer
+- name: Installer Composer
   become : yes
   tags: composer
   command: php /tmp/composer-setup.php --install-dir=/usr/bin --filename=composer
 
-- name: Update to latest composer version
+- name: Mise à jour de la dernière version de composer
   become : yes
   tags: composer
   command: composer selfupdate
 
-- name : clone repo laravel api
+- name : Cloner le dépôt Laravel API
   become: true
   git :
     repo: https://github.com/Nico-Dobrowolski/api.git
     dest: /var/www/api
 
-- name: Download and update all libs and dependencies
+- name: Télécharger et mettre à jour toutes les bibliothèques et dépendances
   become : yes
   composer:
     command : update
@@ -69,44 +69,40 @@
   environment:
     COMPOSER_NO_INTERACTION: "1"
 
-
-- name: Disable default Apache site
+- name: Désactiver le site Apache par défaut
   become : yes
   shell: /usr/sbin/a2dissite 000-default.conf
 
-- name: Enabled mod_rewrite
+- name: Activer mod_rewrite
   become : yes
   apache2_module: name=rewrite state=present
 
-- name: Enabled mod_headers
+- name: Activer mod_headers
   become : yes
   apache2_module: name=headers state=present
 ## Handel
-- name: restarted Apache2 
+- name: Redémarré Apache2 
   become : yes
   service: name=apache2 state=restarted
 
-- name : Setup Virtual Host for Laravel api
+- name : Configuration d'un hôte virtuel pour le Laravel API
   become : yes
   template :
     src : api.com.conf
     dest : /etc/apache2/sites-available/
 
-- name: Enable Laravel api site
+- name: Activer le site Laravel API
   become : yes
   shell: /usr/sbin/a2ensite api.com.conf
 
-- name: restarted Apache2
+- name: Redémarré Apache2
   become : yes
   service: name=apache2 state=restarted
 
-- name: Change permissions file
+- name: Modifier les autorisations [Fichier]
   become : yes
   shell : find /var/www/api -type f -exec chmod 777 {} -R \;
 
-- name: Change permissions directory
+- name: Modifier les autorisations [Dossier]
   become : yes
   shell : find /var/www/api -type d -exec chmod 777 {} -R \;
-
-- name: Print the gateway this host
-  debug: var=ansible_default_ipv4.address

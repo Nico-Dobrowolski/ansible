@@ -1,9 +1,9 @@
 ---
-- name : Start Apache
+- name : Démarrer Apache
   become : yes
   service : name=apache2 state=started enabled=true
 
-- name : Restart Apache
+- name : Redémarrer Apache
   become : yes
   service : name=apache2 state=restarted enabled=true
 

@@ -1,11 +1,11 @@
 ---
 
-- name: Run apt of "apt-get update" as a separate step
+- name: Exécuter [apt-get update]
   become: true
   apt:
     update_cache: yes
 
-- name : Installation de PHP for Laravel with Apache
+- name : Installation des outils par défaut
   become: true
   apt:
     name :

@@ -1,78 +1,78 @@
 ---
-- name: "Add nodejs apt key"
+- name: Ajouter la clé nodejs apt
   become: true
   apt_key:
     url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
     state: present
 
-- name: "Add nodejs 16.x ppa for apt repo"
+- name: Ajouter le dépôt nodejs 16.x
   become: true
   apt_repository:
     repo: deb https://deb.nodesource.com/node_16.x {{ ansible_distribution_release }} main
     update_cache: yes
 
-- name: "Install nodejs"
+- name: Installer nodejs
   become: true
   apt:
     update_cache: yes
     name: nodejs
     state: latest
 
-- name : clone repo react app
+- name : cloner le dépôt react app
   become: true
   git :
     repo: https://github.com/Nico-Dobrowolski/app.git
     dest: /opt/app
 
-- name : Copy .env.production to /opt/app
+- name : Copier le fichier .env.production dans /opt/app
   become : yes
   copy:
     src : .env.production
     dest : /opt/app
 
-- name: Init app
+- name: Initialisation de l'application
   become: true
   command: npm i
   args:
     chdir: "/opt/app"
 
-- name: Build app
+- name: Construire l'application en mode production
   become: true
   command: npm run build
   args:
     chdir: "/opt/app"
 
-- name: Copy App to var/www
+- name: Copier l'application dans var/www
   become: true
   copy:
     remote_src : yes
     src: /opt/app/build
     dest: /var/www
 
-- name : Copy .htaccess to /var/www/build
+- name : Copier .htaccess dans /var/www/build
   become : yes
   copy:
     src : .htaccess
     dest : /var/www/build
 
-- name : Setup Virtual Host for React app
+- name : Configurer un hôte virtuel pour l'application React
   become : yes
   template :
     src : app.com.conf
     dest : /etc/apache2/sites-available/
 
-- name: Enable React app site
+- name: Activer le site de l'application React
   become : yes
   shell: /usr/sbin/a2ensite app.com.conf
 
-- name: Disable default Apache site
+- name: Désactiver le site Apache par défaut
   become : yes
   shell: /usr/sbin/a2dissite 000-default.conf
 
-- name: enabled mod_rewrite
+- name: Activer mod_rewrite
   become : yes
   apache2_module: name=rewrite state=present
 
-- name: restarted Apache2
+- name: Redémarré Apache2
   become : yes
   service: name=apache2 state=restarted
